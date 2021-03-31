@@ -20,7 +20,7 @@ select
     tc.sub,
     tc.subb,
     b.country_name "Bottom 20",
-    b.total_cases "Total Cases",
+    b.total_cases "Total Cases"
 from 
 v_top_20 t
 full outer join vw_statistics tc

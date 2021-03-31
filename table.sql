@@ -13,5 +13,3 @@ create table newrecords (
     new_deaths number check(new_deaths >= 0),
     primary key(date_added, country_name)
 );
-
-

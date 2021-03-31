@@ -1,5 +1,5 @@
 CREATE OR REPLACE PACKAGE pkg_covid as
-    procedure add_new_cases;
+    procedure add_new_cases(country_name varchar2,new_case number,new_death number, total_recovered number, serious_case number);
     function get_active_cases return active_cases pipelined;
     function get_closed_cases return closed_cases pipelined;
     function get_meta_of(country varchar2) return country_meta_tbl;
@@ -9,10 +9,17 @@ end pkg_covid;
 
 CREATE OR REPLACE PACKAGE BODY pkg_covid
 as 
-    procedure add_new_cases
+    procedure add_new_cases(country_name in varchar2,new_case in number, new_death in number, total_recovered in number, serious_case in number)
     as
     begin
-        dbms_output.put_line('test');
+        UPDATE covid
+        set 
+            total_cases = total_cases + new_case,
+            deaths = deaths + new_death,
+            recovered = total_recovered,
+            serious = total_serious
+        where country_name = country_name;
+        dbms_output.put_line('Cases added');
     end add_new_cases;
 function get_active_cases return active_cases
     PIPELINED as
@@ -73,8 +80,6 @@ function get_active_cases return active_cases
             meta.today_deaths := 0;
             meta_tbl(1) := meta;
             return meta_tbl;
-
     end get_meta_of;
-    
 end pkg_covid;
 /
