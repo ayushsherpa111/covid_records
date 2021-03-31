@@ -11,7 +11,6 @@ create table newrecords (
     country_name varchar2(50) references COVID(country_name),
     new_cases number check(new_cases >= 0),
     new_deaths number check(new_deaths >= 0),
-    new_recovered number check(new_recovered >= 0),
     primary key(date_added, country_name)
 );
 

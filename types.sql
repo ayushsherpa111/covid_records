@@ -28,3 +28,5 @@ create or replace type active_cases is table of active_obj;
 create or replace type closed_cases is table of closed_obj;
 /
 
+create or replace type country_meta_tbl is table of country_meta_obj;
+/
