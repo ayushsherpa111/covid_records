@@ -21,66 +21,141 @@ nvl(total_cases,0)-nvl(deaths,0)-nvl(recovered,0) active_cases,
 nvl(serious, 0) serious
 from covid;
 
+
+
 CREATE OR REPLACE VIEW vw_statistics
 AS
 SELECT 
-    4 id, 
-    'total_cases' total,
-    'total dead' sub,
-    'total recovered' subb 
+    2 id,
+    'Total Cases:' E,
+    null F,
+    null G,
+    null H,
+    'Deaths:' J,
+    null M,
+    'Recovered' N,
+    null O
 from dual
-UNION
+UNION ALL
 SELECT 
-    5 id, 
-    cast(sum(nvl(total_cases,0)) as varchar2(50)) total_cases, 
-    cast(sum(nvl(deaths, 0)) as varchar2(50)) deaths,
-    cast(sum(nvl(recovered, 0)) as varchar2(50)) recovered
+    3 id, 
+    sum(nvl(total_cases,0)) || '' total_cases, 
+    null F,
+    null G,
+    null H,
+    sum(nvl(deaths, 0)) || '' deaths,
+    null M,
+    sum(nvl(recovered, 0)) || '' recovered,
+    null O
 from covid
-union
+union ALL
 select 
-    7 id,
-    'Total Active Cases',
-    'Total Mild Cases',
-    'Total Serious Case'
-FROM dual
-union
-SELECT 
     8 id,
-    cast(total_active_cases as varchar2(50)),
-    mild_condition ||
-        ' ('|| round(mild_condition*100/total_active_cases,2)||'%)' mild,
-    serious_case ||
-        ' (' || round(serious_case*100/total_active_cases, 2)|| '%)' serious
-from pkg_covid.get_active_cases()
-UNION
-SELECT 
+    null E,
+    null F,
+    null G,
+    null H,
+    null J,
+    null M,
+    'Closed Cases' N,
+    null O
+FROM dual
+union ALL
+select
+    9 id,
+    'Active' E,
+    null F,
+    null G,
+    null H,
+    null J,
+    null M,
+    null N,
+    null O
+from dual
+UNION ALL
+select 
     10 id,
-    'Total Closed',
-    'Total Recovered',
-    'Total Dead'
-FROM dual
-UNION
-SELECT 
+    'Cases' E,
+    null F,
+    (select total_active_cases || '' from pkg_covid.get_active_cases()) G,
+    null H,
+    null J,
+    null M,
+    (select total_closed_case || '' from pkg_covid.get_closed_cases()) N,
+    null O
+from dual
+union all
+select
     11 id,
-    total_closed_case||'',
-    recovered_case ||
-        ' ('||round(recovered_case*100/total_closed_case,2)||'%)' recovered,
-    deaths || 
-        ' (' || round(deaths*100/total_closed_case, 2) || '%)' deaths
-from pkg_covid.get_closed_cases()
-UNION
-SELECT 
-    13 id, 
-    'Country-Position',
-    'Total Cases and Cases Today',
-    'Total Deaths and Deaths Today'
-FROM dual
-union
-SELECT 
-    14 id, 
-    country||'-'||position,
-    cases || '- today: ' || today_cases,
-    deaths || '- today: ' || today_deaths
-from pkg_covid.get_meta_of('Nepal');
+    null E,
+    null F,
+    'Currently Infected Patients' G,
+    null H,
+    null J,
+    null M,
+    'Cases which had an outcome' N,
+    null O
+from dual
+union all
+select 
+    14 id,
+    null E,
+    (select mild_condition ||
+        ' ('|| round(mild_condition*100/total_active_cases,2)||'%)' from pkg_covid.get_active_cases())F,
+    null G,
+    (select serious_case ||
+        ' ('|| round(serious_case*100/total_active_cases,2)||'%)' from pkg_covid.get_active_cases()) H,
+    null J,
+    (select recovered_case ||' ('||round(recovered_case*100/total_closed_case,2)||'%)' from pkg_covid.get_closed_cases()) M,
+    null N,
+    (select deaths ||' ('||round(deaths*100/total_closed_case,2)||'%)' from pkg_covid.get_closed_cases()) O
+from dual
+union all
+select 
+    15 id,
+    null E,
+    'In Mild Condition' F,
+    null G,
+    'Serious or Critical' H,
+    null J,
+    'Recovered/Discharged' M,
+    null N,
+    'Deaths'
+from dual
+union all
+select
+    19 id,
+    null E,
+    (SELECT country||':'||position||'-total: '||cases||';today: '||today_cases||'-'||deaths||';today:'||today_deaths from pkg_covid.get_meta_of('Nepal')) F,
+    null G,
+    null H,
+    null J,
+    null M,
+    null N,
+    null
+from dual;
 
 
+create or replace vw_final
+as
+select 
+    t.rank,
+    t.country_name "Top 20",
+    t.total_cases "Top 20 Cases",
+    tc.E,
+    tc.F,
+    tc.G,
+    tc.H,
+    tc.J,
+    tc.M,
+    tc.N,
+    tc.O,
+    b.country_name "Bottom 20",
+    b.total_cases "Bottom 20 Cases"
+from 
+v_top_20 t
+full outer join vw_statistics tc
+on t.rid = tc.id
+full outer join v_bottom_20 b
+on t.rid = b.rid
+order by 1;

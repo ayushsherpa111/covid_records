@@ -16,9 +16,14 @@ select
     t.rank,
     t.country_name "Top 20",
     t.total_cases "Total Cases",
-    tc.total,
-    tc.sub,
-    tc.subb,
+    tc.E,
+    tc.F,
+    tc.G,
+    tc.H,
+    tc.J,
+    tc.M,
+    tc.N,
+    tc.O,
     b.country_name "Bottom 20",
     b.total_cases "Total Cases"
 from 
