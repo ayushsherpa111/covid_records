@@ -16,8 +16,8 @@ as
         set 
             total_cases = total_cases + new_case,
             deaths = deaths + new_death,
-            recovered = total_recovered,
-            serious = serious_case
+            recovered = nvl(total_recovered, recovered),
+            serious = nvl(serious_case, serious)
         where upper(country_name)=upper(country);
 
         exception when others then dbms_output.put_line('failed transaction');
